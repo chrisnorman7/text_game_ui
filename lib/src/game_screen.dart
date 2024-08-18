@@ -110,13 +110,23 @@ class GameScreen {
 
   /// Redraw the screen.
   ///
-  /// If [statusLines] contain text, they will be printed at the bottom of the
+  /// If [statusLines] is not empty, lines will be printed at the bottom of the
   /// screen, obscuring the tiles there.
   ///
-  /// Each line in [statusLines] must be no longer than [columns].
+  /// If the length of [statusLines] is greater than or equal to [rows],
+  /// [StateError] will be thrown.
+  ///
+  /// Each line in [statusLines] must be no longer than [columns], otherwise
+  /// [StateError] will be thrown.
   void redrawScreen({
     final List<String> statusLines = const [],
   }) {
+    if (statusLines.length >= rows) {
+      final lines = statusLines.length;
+      throw StateError(
+        'No more than $rows status lines can be shown. There are $lines.',
+      );
+    }
     clearScreen();
     final buffer = StringBuffer();
     final maxRows = rows - statusLines.length;
