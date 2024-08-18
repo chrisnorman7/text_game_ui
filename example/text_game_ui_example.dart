@@ -11,15 +11,23 @@ Future<void> main() async {
       if (key == 'q') {
         return true;
       }
-      try {
-        screen
-          ..setTile(screen.cursorPosition, key)
-          ..moveCursor(GameDirection.right)
-          ..redrawScreen();
-        return false;
-      } on InvalidCursorPosition {
-        return true;
+      final cursorDirections = <String, GameDirection>{
+        'w': GameDirection.up,
+        'a': GameDirection.left,
+        's': GameDirection.down,
+        'd': GameDirection.right,
+      };
+      final direction = cursorDirections[key];
+      if (direction != null) {
+        try {
+          screen
+            ..moveCursor(direction)
+            ..redrawScreen();
+        } on InvalidCursorPosition {
+          // Do nothing.
+        }
       }
+      return false;
     },
   );
   print('Goodbye.');
