@@ -117,6 +117,9 @@ class GameScreen {
   }
 
   /// Redraw the screen.
+  ///
+  /// If the length of [statusLine] is greater than or equal to [columns],
+  /// [StateError] will be thrown.
   void redrawScreen() {
     clearScreen();
     final buffer = StringBuffer();
@@ -135,6 +138,11 @@ class GameScreen {
     }
     final line = statusLine;
     if (line != null) {
+      if (line.length >= columns) {
+        throw StateError(
+          'The status line must be no longer than `columns` ($columns).',
+        );
+      }
       buffer
         ..write(line)
         ..write(Platform.lineTerminator);
