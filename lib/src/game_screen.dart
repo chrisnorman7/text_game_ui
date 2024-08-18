@@ -58,6 +58,14 @@ class GameScreen {
   /// The current location of the cursor.
   CursorPosition cursorPosition;
 
+  /// The status line to print at the bottom of the screen.
+  ///
+  /// If [statusLine] is `null`, the tiles will fill the screen.
+  ///
+  /// If you wish to include a [statusLine] [rows] should be 1 less than the
+  /// actual height of the screen.
+  String? statusLine;
+
   /// Move the cursor.
   ///
   /// If the new cursor position would move the cursor past the start or end of
@@ -124,6 +132,12 @@ class GameScreen {
         buffer.write(character);
       }
       buffer.write(Platform.lineTerminator);
+    }
+    final line = statusLine;
+    if (line != null) {
+      buffer
+        ..write(line)
+        ..write(Platform.lineTerminator);
     }
     stdout.write(buffer);
   }
