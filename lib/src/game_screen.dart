@@ -165,14 +165,10 @@ class GameScreen {
       final key = String.fromCharCodes(charCodes);
       final shouldQuid = await keyHandler(key);
       if (shouldQuid) {
+        stdin.lineMode = true;
+        stdin.echoMode = true;
         break;
       }
     }
-    try {
-      stdin.lineMode = true;
-      stdin.echoMode = true;
-    } on StdinException {
-      // Do nothing.
-    } finally {}
   }
 }
