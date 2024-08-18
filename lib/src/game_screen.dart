@@ -138,6 +138,10 @@ class GameScreen {
     _tiles[point] = tileCharacter;
   }
 
+  /// Set the tile at [cursorPosition] to [tileCharacter].
+  void setTileAtCursorPosition(final String tileCharacter) =>
+      setTile(cursorPosition, tileCharacter);
+
   /// Clear the tile at [point].
   void clearTile(final CursorPosition point) {
     _tiles.remove(point);
