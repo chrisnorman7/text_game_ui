@@ -9,3 +9,4 @@ export 'src/game_directions.dart';
 export 'src/game_options_loader.dart';
 export 'src/game_screen.dart';
 export 'src/json/text_game_ui_options.dart';
+export 'src/simple_key_handler.dart';
