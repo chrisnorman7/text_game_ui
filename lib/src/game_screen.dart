@@ -101,13 +101,7 @@ class GameScreen {
 
   /// Clear the screen.
   void clearScreen() {
-    final String command;
-    if (Platform.isWindows) {
-      command = 'cls';
-    } else {
-      command = 'clear';
-    }
-    Process.runSync(command, [], runInShell: true);
+    stdout.write('\x1B[2J\x1B[0;0H');
   }
 
   /// Redraw the screen.
