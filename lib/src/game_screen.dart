@@ -143,6 +143,9 @@ class GameScreen {
     _tiles.remove(point);
   }
 
+  /// Clear the tile at [cursorPosition].
+  void clearTileAtCursorPosition() => clearTile(cursorPosition);
+
   /// Get the tile character at [point].
   ///
   /// If [point] has no tile character, `null` will be returned.
