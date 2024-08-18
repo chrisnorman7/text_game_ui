@@ -4,6 +4,8 @@ import 'dart:io';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:path/path.dart' as path;
 
+import '../game_options_loader.dart';
+
 part 'text_game_ui_options.g.dart';
 
 /// The options for the text_game_ui package.
@@ -33,16 +35,8 @@ class TextGameUiOptions {
 
   /// Returns the file where options should be stored.
   static File get optionsFile {
-    final homeEnvironmentVariable = Platform.isWindows ? 'userprofile' : 'HOME';
-    final homeDirectoryPath = Platform.environment[homeEnvironmentVariable];
-    if (homeDirectoryPath == null) {
-      throw UnimplementedError(
-        // ignore: lines_longer_than_80_chars
-        'Need to know the name of the environment variable where the home directory is stored on ${Platform.operatingSystem} version ${Platform.operatingSystemVersion}.',
-      );
-    }
     final fullPath = path.join(
-      homeDirectoryPath,
+      GameOptionsLoader.homeDirectory,
       optionsFilename,
     );
     return File(fullPath);
