@@ -1,6 +1,6 @@
 name: text_game_ui
 description: A UI toolkit for writing text-based games.
-version: 1.0.0
+version: 0.0.0
 repository: https://github.com/chrisnorman7/text_game_ui
 
 environment:
