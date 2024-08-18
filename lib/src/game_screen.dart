@@ -159,6 +159,7 @@ class GameScreen {
       final key = String.fromCharCodes(charCodes);
       final shouldQuid = await keyHandler(key);
       if (shouldQuid) {
+        clearScreen();
         stdin.lineMode = true;
         stdin.echoMode = true;
         break;
