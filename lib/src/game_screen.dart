@@ -4,6 +4,8 @@ import 'dart:math';
 import 'package:characters/characters.dart';
 
 import 'constants.dart';
+import 'exceptions.dart';
+import 'game_directions.dart';
 import 'json/text_game_ui_options.dart';
 
 /// A screen for a game.
@@ -54,22 +56,58 @@ class GameScreen {
   final String cursorCharacter;
 
   /// The current location of the cursor.
-  Point<int> cursorPosition;
+  CursorPosition cursorPosition;
+
+  /// Move the cursor.
+  ///
+  /// If the new cursor position would move the cursor past the start or end of
+  /// the current line, the cursor will be moved up or down accordingly. If this
+  /// call would cause the cursor to move past [columns] and [rows] or before
+  /// `0, 0`, [InvalidCursorPosition`, will be thrown.
+  ///
+  /// Note: calls to [moveCursor] do not redraw the screen. You must call
+  /// [redrawScreen] manually.
+  void moveCursor(final GameDirection direction) {
+    final int xModifier;
+    final int yModifier;
+    switch (direction) {
+      case GameDirection.up:
+        xModifier = 0;
+        yModifier = -1;
+      case GameDirection.down:
+        xModifier = 0;
+        yModifier = 1;
+      case GameDirection.left:
+        xModifier = -1;
+        yModifier = 0;
+      case GameDirection.right:
+        xModifier = 1;
+        yModifier = 0;
+    }
+    var x = cursorPosition.x + xModifier;
+    var y = cursorPosition.y + yModifier;
+    if (x >= columns) {
+      x = 0;
+      y++;
+    }
+    if (x < 0 || y < 0 || x >= columns || y >= rows) {
+      throw InvalidCursorPosition(Point(x, y));
+    }
+    cursorPosition = Point(x, y);
+  }
 
   /// The current state of the screen.
-  final Map<Point<int>, String> _tiles;
+  final Map<CursorPosition, String> _tiles;
 
-  /// Clears the terminal screen in a cross-platform way.
+  /// Clear the screen.
   void clearScreen() {
-    // Check if the platform is Windows
+    final String command;
     if (Platform.isWindows) {
-      // Send a command to clear the console screen on Windows
-      stdout.write('\x1B[2J\x1B[0;0H');
+      command = 'cls';
     } else {
-      // Send the escape sequence to clear the console on Unix-like systems
-      stdout.write('\x1B[2J\x1B[H');
+      command = 'clear';
     }
-    // Flush the output to make sure the screen is cleared immediately
+    Process.runSync(command, [], runInShell: true);
   }
 
   /// Redraw the screen.
@@ -93,34 +131,48 @@ class GameScreen {
   }
 
   /// Set the tile character at [point].
-  void setTile(final Point<int> point, final String tileCharacter) {
+  void setTile(final CursorPosition point, final String tileCharacter) {
     assert(
       tileCharacter.characters.length == 1,
       'Tile characters must be exactly 1 character in length.',
     );
-    final old = _tiles.remove(point);
-    if (old != tileCharacter) {
-      redrawScreen();
-    }
+    _tiles.remove(point);
     _tiles[point] = tileCharacter;
   }
 
   /// Clear the tile at [point].
-  void clearTile(final Point<int> point) {
-    final oldCharacter = _tiles.remove(point);
-    if (oldCharacter != null) {
-      redrawScreen();
-    }
+  void clearTile(final CursorPosition point) {
+    _tiles.remove(point);
   }
 
   /// Get the tile character at [point].
   ///
   /// If [point] has no tile character, `null` will be returned.
-  String? getTileCharacter(final Point<int> point) => _tiles[point];
+  String? getTileCharacter(final CursorPosition point) => _tiles[point];
 
   /// Get the character which should be printed at [point].
   ///
   /// If [getTileCharacter] returns `null`, [fillCharacter] will be returned.
-  String getCharacterAt(final Point<int> point) =>
+  String getCharacterAt(final CursorPosition point) =>
       getTileCharacter(point) ?? fillCharacter;
+
+  /// Run the game.
+  Future<void> run(final KeyHandler keyHandler) async {
+    stdin
+      ..echoMode = false
+      ..lineMode = false;
+    await for (final charCodes in stdin) {
+      final key = String.fromCharCodes(charCodes);
+      final shouldQuid = await keyHandler(key);
+      if (shouldQuid) {
+        break;
+      }
+    }
+    try {
+      stdin.lineMode = true;
+      stdin.echoMode = true;
+    } on StdinException {
+      // Do nothing.
+    } finally {}
+  }
 }
