@@ -58,14 +58,6 @@ class GameScreen {
   /// The current location of the cursor.
   CursorPosition cursorPosition;
 
-  /// The status line to print at the bottom of the screen.
-  ///
-  /// If [statusLine] is `null`, the tiles will fill the screen.
-  ///
-  /// If you wish to include a [statusLine] [rows] should be 1 less than the
-  /// actual height of the screen.
-  String? statusLine;
-
   /// Move the cursor.
   ///
   /// If the new cursor position would move the cursor past the start or end of
@@ -118,12 +110,17 @@ class GameScreen {
 
   /// Redraw the screen.
   ///
-  /// If the length of [statusLine] is greater than or equal to [columns],
-  /// [StateError] will be thrown.
-  void redrawScreen() {
+  /// If [statusLines] contain text, they will be printed at the bottom of the
+  /// screen, obscuring the tiles there.
+  ///
+  /// Each line in [statusLines] must be no longer than [columns].
+  void redrawScreen({
+    final List<String> statusLines = const [],
+  }) {
     clearScreen();
     final buffer = StringBuffer();
-    for (var y = 0; y < rows; y++) {
+    final maxRows = rows - statusLines.length;
+    for (var y = 0; y < maxRows; y++) {
       for (var x = 0; x < columns; x++) {
         final point = Point(x, y);
         final String character;
@@ -136,11 +133,11 @@ class GameScreen {
       }
       buffer.write(Platform.lineTerminator);
     }
-    final line = statusLine;
-    if (line != null) {
-      if (line.length >= columns) {
+    for (final line in statusLines) {
+      final lineLength = line.length;
+      if (lineLength >= columns) {
         throw StateError(
-          'The status line must be no longer than `columns` ($columns).',
+          'The status line must be no longer than $columns. It is $lineLength.',
         );
       }
       buffer
