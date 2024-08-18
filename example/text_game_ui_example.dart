@@ -8,14 +8,14 @@ Future<void> main() async {
   final screen = GameScreen.fromLoadedOptions()..redrawScreen();
   await screen.run(
     (final key) {
-      if (key == 'q') {
+      if (key == DefaultKeys.quitGame) {
         return true;
       }
       final cursorDirections = <String, GameDirection>{
-        'w': GameDirection.up,
-        'a': GameDirection.left,
-        's': GameDirection.down,
-        'd': GameDirection.right,
+        DefaultKeys.cursorUp: GameDirection.up,
+        DefaultKeys.cursorLeft: GameDirection.left,
+        DefaultKeys.cursorDown: GameDirection.down,
+        DefaultKeys.cursorRight: GameDirection.right,
       };
       final direction = cursorDirections[key];
       if (direction != null) {
