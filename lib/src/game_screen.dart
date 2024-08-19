@@ -94,6 +94,7 @@ class GameScreen {
       throw InvalidCursorPosition(Point(x, y));
     }
     cursorPosition = Point(x, y);
+    stdout.write('\x1B[$y;${x}H');
   }
 
   /// The current state of the screen.
