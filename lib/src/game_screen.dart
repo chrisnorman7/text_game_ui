@@ -94,7 +94,13 @@ class GameScreen {
       throw InvalidCursorPosition(Point(x, y));
     }
     cursorPosition = Point(x, y);
-    stdout.write('\x1B[$y;${x}H');
+    final String escapeSequence;
+    if (Platform.isWindows) {
+      escapeSequence = '\x1B[$y;${x}H';
+    } else {
+      escapeSequence = '\x1B[$y;${x}H';
+    }
+    stdout.write(escapeSequence);
   }
 
   /// The current state of the screen.
